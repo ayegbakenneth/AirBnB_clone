@@ -85,7 +85,7 @@ class HBNBCommand(cmd.Cmd):
         and save the change into the JSON file.
         """
         parsed_arguments = shlex.split(arg)
-        instances = storage.all()
+        
         if len(parsed_arguments) == 0:
             print("** class name missing **")
         elif parsed_arguments[0] not in self.valid_classes:
@@ -95,6 +95,7 @@ class HBNBCommand(cmd.Cmd):
         elif "{}.{}".format(argl[0], argl[1]) not in objdict.keys():
             print("** no instance found **")
         else:
+            instances = storage.all()
             key = "{}.{}".format(parsed_arguments[0], parsed_arguments[1])
             if key in instances:
 
