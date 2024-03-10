@@ -92,8 +92,6 @@ class HBNBCommand(cmd.Cmd):
             print("** class doesn't exist **")
         elif len(parsed_arguments) == 1:
             print("** instance id missing **")
-        elif "{}.{}".format(argl[0], argl[1]) not in objdict.keys():
-            print("** no instance found **")
         else:
             instances = storage.all()
             key = "{}.{}".format(parsed_arguments[0], parsed_arguments[1])
@@ -102,23 +100,22 @@ class HBNBCommand(cmd.Cmd):
                 del instances[key]
                 storage.save()
             else:
-                print("** no instance found **")
+               print("** no instance found **")
 
     def do_all(self, arg):
-        """Usage: all or all <class> or <class>.all()
-        Display string representations of all instances of a given class.
-        If no class is specified, displays all instantiated objects."""
-        argl = parse(arg)
-        if len(argl) > 0 and argl[0] not in HBNBCommand.__classes:
-            print("** class doesn't exist **")
+        """ Prints all string representation of all instances 
+        based or not on the class name."""
+        instances = storage.all()
+        parsed_arguments = shlex.split(arg)
+        if len(parsed_arguments) == 0:
+            for key, value in instances.items():
+                 print(str(value))
+        elif parsed_arguments[0] not in self.valid_classes:
+             print("** class doesn't exist **")
         else:
-            objl = []
-            for obj in storage.all().values():
-                if len(argl) > 0 and argl[0] == obj.__class__.__name__:
-                    objl.append(obj.__str__())
-                elif len(argl) == 0:
-                    objl.append(obj.__str__())
-            print(objl)
+            for key, value in instance.items():
+                if key.split(',')[0] == parsed_arguments[0]:
+                    print(str(value))
 
     def do_count(self, arg):
         """Usage: count <class> or <class>.count()
