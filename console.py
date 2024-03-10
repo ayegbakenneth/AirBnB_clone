@@ -77,8 +77,8 @@ class HBNBCommand(cmd.Cmd):
             key = "{}.{}".format(parsed_arguments[0], parsed_arguments[1])
             if key in instances:
                 print(instances[key])
-        else:
-            print("** no instance found **")
+            else:
+                print("** no instance found **")
 
     def do_destroy(self, arg):
         """Deletes an instance based on the class name and id
@@ -99,8 +99,10 @@ class HBNBCommand(cmd.Cmd):
             key = "{}.{}".format(parsed_arguments[0], parsed_arguments[1])
             if key in instances:
 
-            del instances[key]
-            storage.save()
+                del instances[key]
+                storage.save()
+            else:
+                print("** no instance found **")
 
     def do_all(self, arg):
         """Usage: all or all <class> or <class>.all()
