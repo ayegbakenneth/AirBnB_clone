@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-"""Defines the HBnB console."""
+""" A program that contains entry point of the console"""
 import cmd
 import re
 from shlex import split
@@ -14,12 +14,11 @@ from models.review import Review
 
 
 class HBNBCommand(cmd.Cmd):
-    """This is the HolbertonBnB command interpreter.
+    """This is the HolbertonBnB class of the command line interpreter.
 
-    Attributes:
-        prompt (str): The command prompt.
+        A custom prompt: (str): The command prompt.
     """
-
+    
     prompt = "(hbnb) "
     __classes = {
         "BaseModel",
@@ -38,10 +37,14 @@ class HBNBCommand(cmd.Cmd):
     def do_quit(self, arg):
         """The command to exit the program."""
         return True
+    
+    def help_quit(self, arg):
+        """This action is provided by default by cmd."""
+        print("A command to exit the program")
 
     def do_EOF(self, arg):
-        """End of file signal to exit the program."""
-        print("")
+        """ An End of file which signals to exit the program."""
+        print()
         return True
 
     def do_create(self, arg):
