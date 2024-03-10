@@ -48,50 +48,57 @@ class HBNBCommand(cmd.Cmd):
         return True
 
     def do_create(self, arg):
-        """Usage: create <class>
-        Create a new class instance and print its id.
+        """ Creates a new instance of BaseModel, saves it (to the JSON file) 
+        and prints the id.
         """
-        arg1 = parse(arg)
-        if len(argl) == 0:
+        parsed_arguments = shlex.split(arg)
+        if len(parsed_arguments) == 0:
             print("** class name missing **")
-        elif argl[0] not in HBNBCommand.__classes:
+        elif parsed_arguments[0] not in self.valid_classes:
             print("** class doesn't exist **")
         else:
-            print(eval(argl[0])().id)
-            storage.save()
+            new_object = BaseModel()
+            new_object.save()
+            print(new_object.id)
 
     def do_show(self, arg):
-        """Usage: show <class> <id> or <class>.show(<id>)
+        """
         Display the string representation of a class instance of a given id.
         """
-        argl = parse(arg)
-        objdict = storage.all()
-        if len(argl) == 0:
+        parsed_arguments = shlex.split(arg)
+        if len(parsed_arguments) == 0:
             print("** class name missing **")
-        elif argl[0] not in HBNBCommand.__classes:
+        elif parsed_arguments[0] not in self.valid_classes:
             print("** class doesn't exist **")
-        elif len(argl) == 1:
+        elif len(parsed_arguments) == 1:
             print("** instance id missing **")
-        elif "{}.{}".format(argl[0], argl[1]) not in objdict:
-            print("** no instance found **")
         else:
-            print(objdict["{}.{}".format(argl[0], argl[1])])
+            instances = storage.all()
+            key = "{}.{}".format(parsed_arguments[0], parsed_arguments[1])
+            if key in instances:
+                print(instances[key])
+        else:
+            print("** no instance found **")
 
     def do_destroy(self, arg):
-        """Usage: destroy <class> <id> or <class>.destroy(<id>)
-        Delete a class instance of a given id."""
-        argl = parse(arg)
-        objdict = storage.all()
-        if len(argl) == 0:
+        """Deletes an instance based on the class name and id
+        and save the change into the JSON file.
+        """
+        parsed_arguments = shlex.split(arg)
+        instances = storage.all()
+        if len(parsed_arguments) == 0:
             print("** class name missing **")
-        elif argl[0] not in HBNBCommand.__classes:
+        elif parsed_arguments[0] not in self.valid_classes:
             print("** class doesn't exist **")
-        elif len(argl) == 1:
+        elif len(parsed_arguments) == 1:
             print("** instance id missing **")
         elif "{}.{}".format(argl[0], argl[1]) not in objdict.keys():
             print("** no instance found **")
         else:
-            del objdict["{}.{}".format(argl[0], argl[1])]
+            key = "{}.{}".format(parsed_arguments[0], parsed_arguments[1])
+            if key in instances:
+
+            del instances[key]
             storage.save()
 
     def do_all(self, arg):
