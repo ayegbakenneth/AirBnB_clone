@@ -51,10 +51,10 @@ class HBNBCommand(cmd.Cmd):
         """ Creates a new instance of BaseModel, saves it (to the JSON file) 
         and prints the id.
         """
-        parsed_arguments = shlex.split(arg)
+        parsed_arguments = split(arg)
         if len(parsed_arguments) == 0:
             print("** class name missing **")
-        elif parsed_arguments[0] not in self.valid_classes:
+        elif parsed_arguments[0] not in self.__classes:
             print("** class doesn't exist **")
         else:
             new_object = BaseModel()
@@ -65,12 +65,12 @@ class HBNBCommand(cmd.Cmd):
         """
         Display the string representation of a class instance of a given id.
         """
-        parsed_arguments = shlex.split(arg)
+        parsed_arguments = split(arg)
         if len(parsed_arguments) == 0:
             print("** class name missing **")
-        elif parsed_arguments[0] not in self.valid_classes:
+        elif parsed_arguments[0] not in self.__classes:
             print("** class doesn't exist **")
-        elif len(parsed_arguments) == 1:
+        elif len(parsed_arguments) < 2:
             print("** instance id missing **")
         else:
             instances = storage.all()
@@ -84,13 +84,13 @@ class HBNBCommand(cmd.Cmd):
         """Deletes an instance based on the class name and id
         and save the change into the JSON file.
         """
-        parsed_arguments = shlex.split(arg)
+        parsed_arguments = split(arg)
         
         if len(parsed_arguments) == 0:
             print("** class name missing **")
-        elif parsed_arguments[0] not in self.valid_classes:
+        elif parsed_arguments[0] not in self.__classes:
             print("** class doesn't exist **")
-        elif len(parsed_arguments) == 1:
+        elif len(parsed_arguments) < 2:
             print("** instance id missing **")
         else:
             instances = storage.all()
@@ -106,76 +106,47 @@ class HBNBCommand(cmd.Cmd):
         """ Prints all string representation of all instances 
         based or not on the class name."""
         instances = storage.all()
-        parsed_arguments = shlex.split(arg)
+        parsed_arguments = split(arg)
         if len(parsed_arguments) == 0:
             for key, value in instances.items():
                  print(str(value))
-        elif parsed_arguments[0] not in self.valid_classes:
+        elif parsed_arguments[0] not in self.__classes:
              print("** class doesn't exist **")
         else:
-            for key, value in instance.items():
+            for key, value in instances.items():
                 if key.split(',')[0] == parsed_arguments[0]:
                     print(str(value))
 
-    def do_count(self, arg):
-        """Usage: count <class> or <class>.count()
-        Retrieve the number of instances of a given class."""
-        argl = parse(arg)
-        count = 0
-        for obj in storage.all().values():
-            if argl[0] == obj.__class__.__name__:
-                count += 1
-        print(count)
-
     def do_update(self, arg):
-        """Usage: update <class> <id> <attribute_name> <attribute_value> or
-       <class>.update(<id>, <attribute_name>, <attribute_value>) or
-       <class>.update(<id>, <dictionary>)
-        Update a class instance of a given id by adding or updating
-        a given attribute key/value pair or dictionary."""
-        argl = parse(arg)
-        objdict = storage.all()
+        """ Updates an instance based on the class name and id by adding 
+        or updating attribute save the change into the JSON file."""
+        parsed_arguments = split(arg)
 
-        if len(argl) == 0:
+        if len(parsed_arguments) == 0:
             print("** class name missing **")
-            return False
-        if argl[0] not in HBNBCommand.__classes:
+        elif parsed_arguments[0] not in self.__classes:
             print("** class doesn't exist **")
-            return False
-        if len(argl) == 1:
+        if len(parsed_arguments) < 2:
             print("** instance id missing **")
-            return False
-        if "{}.{}".format(argl[0], argl[1]) not in objdict.keys():
-            print("** no instance found **")
-            return False
-        if len(argl) == 2:
-            print("** attribute name missing **")
-            return False
-        if len(argl) == 3:
-            try:
-                type(eval(argl[2])) != dict
-            except NameError:
+        else:
+            instances = storage.all()
+            key = "{}.{}".format(parsed_arguments[0], parsed_arguments[1])
+            if key not in instances:
+                print("** no instance found **")
+            elif len(parsed_arguments) < 3:
+                print("** attribute name missing **")
+            elif len(parsed_arguments) < 4:
                 print("** value missing **")
-                return False
-
-        if len(argl) == 4:
-            obj = objdict["{}.{}".format(argl[0], argl[1])]
-            if argl[2] in obj.__class__.__dict__.keys():
-                valtype = type(obj.__class__.__dict__[argl[2]])
-                obj.__dict__[argl[2]] = valtype(argl[3])
             else:
-                obj.__dict__[argl[2]] = argl[3]
-        elif type(eval(argl[2])) == dict:
-            obj = objdict["{}.{}".format(argl[0], argl[1])]
-            for k, v in eval(argl[2]).items():
-                if (k in obj.__class__.__dict__.keys() and
-                        type(obj.__class__.__dict__[k]) in {str, int, float}):
-                    valtype = type(obj.__class__.__dict__[k])
-                    obj.__dict__[k] = valtype(v)
-                else:
-                    obj.__dict__[k] = v
-        storage.save()
-
+                obj = instances[key]
+                attr_name = parsed_arguments[2]
+                attr_value = parsed_arguments[3]
+                try:
+                    attr_value = (eval(attr_value))
+                except Exception:
+                    pass
+                setattr(obj, attr_name, attr_value)
+                obj.save()
 
 if __name__ == "__main__":
     HBNBCommand().cmdloop()
